@@ -38,7 +38,7 @@ Having familiarized myself with *HOG feature* extraction, as well as *binned col
 The following table summarizes my findings:
 
 |Color|Spatial Bin.|Color Hist.|HOG Channels|HOG Orient.|HOG Pix./Cell|HOG Cells/Block|Feature Extrac. Time|Train. Time|Accuracy|
-|:------:|:-----:|:-----:|:-----:|:-----:|:-----:|:-----:|
+|:------:|:-----:|:-----:|:-----:|:-----:|:-----:|:-----:|:-----:|:-----:|:-----:|
 |HLS|Yes|Yes|All|9|8|2|401.06|15.88|0.9913|
 |HLS|No|No|All|9|8|2|372.04|64.46|0.9783|
 |HSV|No|No|All|9|8|2|377.77|16.67|0.9783|
@@ -70,9 +70,7 @@ Below table shows execution times using different parameter combinations for the
 
 In the *Model Training* code cell, I trained the classifier by first extracting the HOG features and then feeding them to a linear SVM using the following parameter combination:
 
-```
-python
-
+```python
 color_space = 'YUV'
 orient = 11  
 pix_per_cell = 12 
@@ -96,7 +94,7 @@ Following image summarizes the model training process:
 
 I implemented the sliding window search in the function `find_cars()` (code cell *Car Detection*). This function takes in an array of tuples `ydims_scales`. The first 2 elements are the *start* and *end* positions on y-axis of the image for specifying only that area in the image where cars might appear and the last element of the tuple specifies the window scale. Searching in a sub-area of the image greatly reduces the execution time & further reduces false positives at smaller scales. Then the image is resized based on the scale and the number of blocks for both x & y direction are then calculated. Also, the number of blocks that would fit into the search window are calculated, based on the default window size of `64 x 64` pixels. The scale increases or decreases the window size e.g. with a scale of `1.5`, the resulting window size is `96x96` pixels. For controlling the overlap behavior, `cells_per_step` setting is used. With `cells_per_step = 2` and a scale of `1`, the overlap is `62.50%` in both x & y directions (for other scales, see the table below). A setting of `cells_per_step = 1` is used for scales above `2` to increase the possibility of detecting more cars at those scales, as the window size is larger than normal and with using `cells_per_step = 2`, either there is no overlap or areas are missed at the right side of the image. 
 
-After extensive experimenting, I settled for these scales: `1`,`1.3`,`1.5`,`1.7`,`2.0`,`2.5`,`3.0` & `3.5`. Each of these scales are restricted in vertical direction as smaller scales tend to not only result in more false positives but also increase execution time if searched for the entire area where cars might appear. For each scale, the HOG features are only extracted once and then sub-sampled for each sliding search window, which decreases the execution time.
+After extensive experimenting, I settled for these scales: `1`,`1.3`,`1.5`,`1.7`,`2.0`,`2.5`,`3.0` & `3.5`. Each of these scales is restricted in vertical direction as smaller scales tend to not only result in more false positives but also increase execution time if searched for the entire area where cars might appear. For each scale, the HOG features are only extracted once and then sub-sampled for each sliding search window, which decreases the execution time.
 
 The following series of images show the sliding windows and their overlap at the aforementioned scales:
 
@@ -119,7 +117,7 @@ The following series of images show the sliding windows and their overlap at the
 
 **Sliding window Scales**
 
-|Scale|Size (wxh)|Overlap % (x & y)|Window Step (pixels)|No. of Windows (vertically)|Start (y-axis)|End (y-axis)|
+|Scale|Size (wxh)|Overlap %     (x & y)|Window Step (pixels)|No. of Windows (vertically)|Start      (y-axis)|End      (y-axis)|
 |:------:|:-----:|:-----:|:-----:|:-----:|:-----:|:-----:|
 |1.0|64x64|62.50|24|3|400|536|
 |1.3|83x83|62.74|31|3|400|578|
@@ -169,19 +167,25 @@ The second stage of the false positive identification is implemented in the `dra
 
 To smooth out the jittering of the final bounding boxes and to deal with frames with no detections, I am keeping heatmaps of the previous 15 frames and then creating an averaged heatmap.
 
-Here's an example result showing the heatmap from a series of frames of video, the result of `scipy.ndimage.measurements.label()` and the bounding boxes then overlaid on the last frame of video:
+The below image shows the output from the `find_cars()` function with positive detections at different scales:
 
-### Here are six frames and their corresponding heatmaps:
+![bounding boxes all](/output_images/b_boxes_all.jpg)
 
-![alt text][image5]
+Next, a heatmap is generated from these positive detections:
 
-### Here is the output of `scipy.ndimage.measurements.label()` on the integrated heatmap from all six frames:
-![alt text][image6]
+![heatmap](/output_images/heatmap.jpg)
 
-### Here the resulting bounding boxes are drawn onto the last frame in the series:
-![alt text][image7]
+The heatmap is then thresholded based on the `duplicate_threshold` parameter value to remove false positives:
 
+![heatmap](/output_images/heatmap_thresholded.jpg)
 
+Then, the `label()` function is used to identify individual cars in the heatmap:
+
+![heatmap](/output_images/labels.jpg)
+
+Finally, bounding boxes are generated from thee labelled image:
+
+![heatmap](/output_images/b_boxes_final.jpg)
 
 ---
 
