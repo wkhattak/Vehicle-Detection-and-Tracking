@@ -193,5 +193,33 @@ Finally, bounding boxes are generated from thee labelled image:
 
 #### 1. Briefly discuss any problems / issues you faced in your implementation of this project.  Where will your pipeline likely fail?  What could you do to make it more robust?
 
-Here I'll talk about the approach I took, what techniques I used, what worked and why, where the pipeline might fail and how I might improve it if I were going to pursue this project further.  
+The main issue that I faced was training a classifier 
+that performs well on test images and the video. Although, all different parameter combinations for training the classifier produced more or less same level of accuracy, however, upon testing they didn't perform as expected. Either they were not detecting vehicles or coming up with too many false positives. The second most difficult part was selecting the right scale range and involved a lot of experimentation. I had to resort to other (not so ideal) ways of false positive identification techniques, such as specifying a minimum size for positive detections and ignoring detections which are on the left half of the road. the application of these measures expose the not so robust nature of the implemented pipeline. Also, the extreme right side of the image is not fully covered by the sliding windows due to which the detections are not reported until the a sizeable portion of the car appears in the area of the interest. The main reason is that currently a square window is used, whereas the image is rectangular in shape (720 x 1280).
 
+To further improve the pipeline, following measures could be introduced:
+
+1. Experiment with non-linear (kernel based) SVM classifiers.
+
+2. Use rectangular search windows.
+
+3. Further investigate optimum window sizes with reduced vertical as well as horizontal areas of interest.
+
+4. Add further training data, especially with a variety of lighting conditions.
+
+5. Make the pipeline real-time.
+
+6. Apply intelligent vehicle tracking by actually knowing which vehicle is which in the image and add labels to the bounding boxes with vehicle id.
+
+7. Use CNN based approaches, such as [YOLO]( https://github.com/subodh-malgonde/vehicle-detection), [SSD](https://www.cs.unc.edu/~wliu/papers/ssd.pdf) and [U-Net](https://chatbotslife.com/small-u-net-for-vehicle-detection-9eec216f9fd6). 
+
+---
+
+### References
+
+* https://discussions.udacity.com/t/final-bounding-boxes-on-test-images-does-not-completely-enclose-the-car/238416/13
+
+* https://github.com/NikolasEnt/Vehicle-Detection-and-Tracking
+
+* https://github.com/jeremy-shannon/CarND-Vehicle-Detection
+
+* https://medium.com/self-driving-cars/3-approaches-to-vehicle-detection-and-tracking-413fe50f75fc
