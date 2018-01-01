@@ -153,12 +153,19 @@ The pipeline is implemented via the `process_frame()` function (code cell *Main 
 ### Video Implementation
 
 #### 1. Provide a link to your final video output.  Your pipeline should perform reasonably well on the entire project video (somewhat wobbly or unstable bounding boxes are ok as long as you are identifying the vehicles most of the time with minimal false positives.)
-Here's a [link to my video result](./project_video.mp4)
+
+Here's a [link to my video result](./project_video_output.mp4)
 
 
 #### 2. Describe how (and identify where in your code) you implemented some kind of filter for false positives and some method for combining overlapping bounding boxes.
 
-I recorded the positions of positive detections in each frame of the video.  From the positive detections I created a heatmap and then thresholded that map to identify vehicle positions.  I then used `scipy.ndimage.measurements.label()` to identify individual blobs in the heatmap.  I then assumed each blob corresponded to a vehicle.  I constructed bounding boxes to cover the area of each blob detected.  
+The code for the implementation of filtering false positives is spread across the cells *Car Detection* and *Main Pipeline* cells while the code for combining overlapping bounding boxes can be found in the *Car Detection* code cell.
+
+I recorded the positions of positive detections in each frame of the video.  From the positive detections I created a heatmap, `add_heat()` function, and then thresholded the heatmap, `apply_threshold()` function, to identify vehicle positions.  I then used `scipy.ndimage.measurements.label()` function to identify individual blobs in the heatmap.  I then assumed each blob corresponded to a vehicle.  I constructed bounding boxes, `draw_labeled_bboxes()` function, to cover the area of each blob detected.  
+
+The first stage of filtering false positives is implemented in the `find_cars()` function. The classifier's [decision_function()](http://scikit-learn.org/stable/modules/generated/sklearn.svm.LinearSVC.html#sklearn.svm.LinearSVC.decision_function()) provides the prediction confidence score. If this score is less than the `min_prediction_confidence` value or if the top-left x position of the detected bounding box is less than the `x_threshold`, the detection is ignored.
+
+The second stage of the false positive identification is implemented in the `draw_labeled_bboxes()` function. Here I am checking if the bounding box dimensions are less than the `min_bbox_w_h` value, then it is discarded.
 
 Here's an example result showing the heatmap from a series of frames of video, the result of `scipy.ndimage.measurements.label()` and the bounding boxes then overlaid on the last frame of video:
 
