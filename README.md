@@ -1,4 +1,4 @@
-# Project: Advanced Lane Finding
+# Project: Vehicle Detection and Tracking
 ## Overview   
    
 This project is about writing a software pipeline to detect cars in a video using an [SVM classifier](https://en.wikipedia.org/wiki/Support_vector_machine) trained on [HOG](https://en.wikipedia.org/wiki/Histogram_of_oriented_gradients) features.
