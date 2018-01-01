@@ -167,6 +167,8 @@ The first stage of filtering false positives is implemented in the `find_cars()`
 
 The second stage of the false positive identification is implemented in the `draw_labeled_bboxes()` function. Here I am checking if the bounding box dimensions are less than the `min_bbox_w_h` value, then it is discarded.
 
+To smooth out the jittering of the final bounding boxes and to deal with frames with no detections, I am keeping heatmaps of the previous 15 frames and then creating an averaged heatmap.
+
 Here's an example result showing the heatmap from a series of frames of video, the result of `scipy.ndimage.measurements.label()` and the bounding boxes then overlaid on the last frame of video:
 
 ### Here are six frames and their corresponding heatmaps:
